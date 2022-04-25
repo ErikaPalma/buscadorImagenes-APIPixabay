@@ -1,5 +1,3 @@
-const APIKey = "27000774-24f141e29c282119bae780cea";
-
 const formulario = document.querySelector("#formulario");
 const resultado = document.querySelector("#resultado");
 
@@ -17,6 +15,8 @@ function validarFormulario(e) {
     mostrarAlerta("Por favor, introduce un término de búsqueda");
     return;
   }
+
+  buscarImagenes(terminoBusqueda);
 }
 
 function mostrarAlerta(mensaje) {
@@ -43,4 +43,19 @@ function mostrarAlerta(mensaje) {
       alerta.remove();
     }, 3000);
   }
+}
+
+function buscarImagenes(termino) {
+  const key = "27000774-24f141e29c282119bae780cea";
+  const url = `https://pixabay.com/api/?key=${key}&q=${termino}&image_type=photo`;
+
+  fetch(url)
+    .then((respuesta) => respuesta.json())
+    .then((resultado) => {
+      mostrarImagenes(resultado.hits);
+    });
+}
+
+function mostrarImagenes(imagenes) {
+  console.log(imagenes);
 }
