@@ -1,9 +1,11 @@
 const formulario = document.querySelector("#formulario");
 const resultado = document.querySelector("#resultado");
+const paginacion = document.querySelector("#paginacion");
 
 const registrosPorPagina = 40;
 let totalPaginas;
 let iterador;
+let paginaActual = 1;
 
 window.onload = () => {
   formulario.addEventListener("submit", validarFormulario);
@@ -20,7 +22,7 @@ function validarFormulario(e) {
     return;
   }
 
-  buscarImagenes(terminoBusqueda);
+  buscarImagenes();
 }
 
 function mostrarAlerta(mensaje) {
@@ -49,9 +51,11 @@ function mostrarAlerta(mensaje) {
   }
 }
 
-function buscarImagenes(termino) {
+function buscarImagenes() {
+  const termino = document.querySelector("#termino").value.trim();
+
   const key = "27000774-24f141e29c282119bae780cea";
-  const url = `https://pixabay.com/api/?key=${key}&q=${termino}&image_type=photo&per_page=100`;
+  const url = `https://pixabay.com/api/?key=${key}&q=${termino}&image_type=photo&per_page=${registrosPorPagina}&page=${paginaActual}`;
 
   fetch(url)
     .then((respuesta) => respuesta.json())
@@ -89,12 +93,16 @@ function mostrarImagenes(imagenes) {
                     <p class="font-bold">${likes}<span class="font-light"> Me gusta</span></p>
                     <p class="font-bold">${views}<span class="font-light"> veces visto</span></p>
                     <p class="font-bold">By ${user}</p>
-                    <button class="btn"><a href="${largeImageURL}" target="_blank" rel="noopener noreferrer">Ver imagen HD</a></button>
+                    <button class="btn btn-color"><a href="${largeImageURL}" target="_blank" rel="noopener noreferrer">Ver imagen HD</a></button>
                 </div>
             </div>
         </div>
      `;
   });
+  //Limpiar paginador previo
+  while (paginacion.firstChild) {
+    paginacion.removeChild(paginacion.firstChild);
+  }
   imprimirPaginador();
 }
 
@@ -106,4 +114,35 @@ function limpiarHTML() {
 
 function imprimirPaginador() {
   iterador = crearPaginador(totalPaginas);
+
+  while (true) {
+    const { value, done } = iterador.next();
+    if (done) {
+      return;
+    } else {
+      //Si no ha llegado al final, genera un botón por cada elemento del generador
+
+      const boton = document.createElement("a");
+      boton.href = "#";
+      boton.dataset.pagina = value;
+      boton.textContent = value;
+      boton.classList.add(
+        "siguiente",
+        "btn-color",
+        "font-bold",
+        "rounded",
+        "py-1",
+        "px-4",
+        "mr-2",
+        "mb-4"
+      );
+
+      boton.onclick = () => {
+        paginaActual = value;
+        buscarImagenes();
+      };
+
+      paginacion.appendChild(boton);
+    }
+  }
 }
